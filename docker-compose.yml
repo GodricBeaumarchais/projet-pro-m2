@@ -27,7 +27,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${EXTERNAL_DATABASE_URL}
+      - DATABASE_URL=postgres://postgres:pg3FJfDUlsYrJXqPyJZjszoxr2exRWIlyC8MXDjwQEX3QYmIe1Iiu5aERca0Zfl3@bccso0cog0s0w8cgws8woc8k:5432/postgres
     command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
   postgres:

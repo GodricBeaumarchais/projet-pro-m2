@@ -1,5 +1,5 @@
 # Stage de build
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
 
 # Stage de production
-FROM node:18-alpine AS production
+FROM node:22-alpine AS production
 
 WORKDIR /app
 

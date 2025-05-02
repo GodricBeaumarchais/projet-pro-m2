@@ -1,5 +1,4 @@
 import { Role } from "./role.entity";
-import { Family } from "./family.entity";
 
 export class User {
     id: string;
@@ -13,7 +12,6 @@ export class User {
     updatedAt: Date;
     role?: Role;
     roleId: string;
-    familys?: Family[];
     giftsGiven?: any;
     giftsReceived?: any;
 

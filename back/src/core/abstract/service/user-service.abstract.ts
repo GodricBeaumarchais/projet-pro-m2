@@ -10,7 +10,5 @@ export abstract class AbsUserService extends IGenericRepository<User> {
 
     abstract getSelf(userId: string): Promise<Partial<User>>;
 
-    abstract getOtherUsers(userId: string): Promise<Partial<User>[]>;
-
     abstract searchUsersByEmail(searchTerm: string): Promise<UserSafe[]>;
 }
