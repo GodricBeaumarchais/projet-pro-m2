@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, IsDate, IsUUID, IsUrl, IsArray, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsDate, IsUUID, IsUrl, IsArray, IsOptional, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateUserDto {
@@ -17,6 +17,9 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
+  @Matches(/^[a-zA-Z0-9-]{3,16}#[A-Z]{3,4}$/, {
+    message: 'Le riotId doit être au format username#TAG'
+  })
   riotId: string;
 
   @IsNotEmpty()
@@ -50,6 +53,10 @@ export class UpdateUserDto {
   @IsDate()
   @Type(() => Date)
   birthDate?: Date;
+
+  @IsOptional()
+  @IsString()
+  riotId?: string;
 
   @IsOptional()
   @IsUUID()

@@ -5,39 +5,43 @@ WORKDIR /app
 
 # Copie des fichiers de dépendances
 COPY package*.json ./
-COPY ./src/orm/prisma/schema.prisma ./src/orm/prisma/
 
 # Installation des dépendances
 RUN npm ci
 
+# Copie du schéma Prisma
+COPY ./src/orm/prisma ./src/orm/prisma/
+
 # Copie du reste du code source
 COPY . .
 
-# Génération du client Prisma
-RUN npx prisma generate
-
-# Build de l'application
-RUN npm run build
+# Génération du client Prisma et build de l'application
+RUN npx prisma generate && npm run build
 
 # Stage de développement
-FROM node:18-alpine AS development
+FROM node:22-alpine AS development
 
 WORKDIR /app
 
 # Copie des fichiers de dépendances
 COPY package*.json ./
 
-# Installation des dépendances
+# Installation des dépendances de développement
 RUN npm install
 
-# Copie du reste du code source
-COPY . .
+# Copie du schéma Prisma
+COPY ./src/orm/prisma ./src/orm/prisma/
 
 # Génération du client Prisma
 RUN npx prisma generate
 
-# Exposition du port
+
+# Copie du reste du code source
+COPY . .
+
+# Exposition des ports
 EXPOSE 3000
+EXPOSE 5555
 
 # Commande de démarrage en mode développement
 CMD ["npm", "run", "start:dev"]
@@ -47,11 +51,20 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
-# Copie des fichiers nécessaires depuis le stage de build
+# Copie des fichiers package.json
+COPY package*.json ./
+
+# Installation des dépendances de production uniquement
+RUN npm ci --only=production
+
+# Copie du schéma Prisma
+COPY ./src/orm/prisma ./src/orm/prisma/
+
+# Génération du client Prisma
+RUN npx prisma generate
+
+# Copie des fichiers de build depuis le builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
 
 # Variables d'environnement pour la production
 ENV NODE_ENV=production

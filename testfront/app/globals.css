@@ -1,0 +1,74 @@
+/* 1. Importation de Preflight (reset global) */
+@import "tailwindcss"; 
+
+/* 2. Directives Tailwind (base et utilities) */
+@tailwind utilities; /* Utilitaires Tailwind (margin, padding, etc.) */
+
+/* 3. Règles CSS personnalisées */
+.font-beaufort-bold {
+  font-family: var(--font-beaufort-bold), serif;
+  font-weight: 700;
+}
+
+.font-beaufort-medium {
+  font-family: var(--font-beaufort-medium), serif;
+  font-weight: 500;
+}
+
+.font-spiegel-regular {
+  font-family: var(--font-spiegel-regular), serif;
+  font-weight: 400;
+}
+
+/* Définir les couleurs */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme{
+  --color-gold-100: #F0E6D2;
+  --color-gold-200: #C8AA6E;
+  --color-gold-300: #C8AA6E;
+  --color-gold-400: #C89B3C;
+  --color-gold-500: #785A28;
+  --color-gold-600: #463714;
+  --color-gold-700: #32281E;
+
+  --color-hextech-100: #CDFAFA;
+  --color-hextech-200: #0AC8B9;
+  --color-hextech-300: #0397AB;
+  --color-hextech-400: #005A82;
+  --color-hextech-500: #0A323C;
+  --color-hextech-600: #091428;
+  --color-hextech-700: #0A1428;
+}
+/* Utilisation de variables pour le thème */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* Application du fond et du texte par défaut */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Styles personnalisés supplémentaires */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -1,6 +1,6 @@
 import { User, UserSafe } from "src/core";
 import { PrismaGenericRepository } from "../generique-repo";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma } from "../../../../generated";
 import { AbsUserService } from "src/core/abstract/service/user-service.abstract";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
@@ -35,14 +35,11 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
 
     async create(item: Partial<User>): Promise<User> {
         const defaultRole = this.configService.get<string>('DEFAULT_ROLE_ID')
-        const defaultAvatar = "/uploads/profile-pics/default.png"
         const userData: Prisma.UserCreateInput = {
             lastName: item.lastName,
             firstName: item.firstName,
             email: item.email,
-            password: item.password,
-            avatar: defaultAvatar,
-            birthDate: item.birthDate,
+            riotId: item.riotId,
             role: {
                 connect: {
                     id: defaultRole,
@@ -66,8 +63,7 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
             lastName: item.lastName,
             firstName: item.firstName,
             email: item.email,
-            avatar: item.avatar,
-            birthDate: item.birthDate,
+            riotId: item.riotId,
         };
         return await this.client.user.update({
             where: { id },
@@ -88,7 +84,7 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
                     id: true,
                     firstName: true,
                     lastName: true,
-                    avatar: true,
+                    riotId: true,
                 },
                 where: { id }
             });
@@ -112,17 +108,15 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
 
 
     async getSelf(userId: string): Promise<Partial<User>> { 
-        
         return this.client.user.findUnique({
             where: { id: userId },
             select: {
                 id: true,
                 firstName: true,
                 lastName: true,
-                avatar: true,
                 email: true,
+                riotId: true,
                 role: true,
-                birthDate: true
             }
         });
     }
@@ -141,7 +135,7 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
                     id: true,
                     firstName: true,
                     lastName: true,
-                    avatar: true
+                    riotId: true
                 }
             });
             
@@ -165,14 +159,7 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
             if (item.lastName !== undefined) updateData.lastName = item.lastName;
             if (item.firstName !== undefined) updateData.firstName = item.firstName;
             if (item.email !== undefined) updateData.email = item.email;
-            if (item.avatar !== undefined) updateData.avatar = item.avatar;
-            if (item.birthDate !== undefined) updateData.birthDate = item.birthDate;
-            if (item.password !== undefined) {
-                // Cryptage du mot de passe
-                const bcrypt = require('bcrypt');
-                const saltRounds = 10;
-                updateData.password = await bcrypt.hash(item.password, saltRounds);
-            }
+            if (item.riotId !== undefined) updateData.riotId = item.riotId;
             
             return await this.client.user.update({
                 where: { id: userId },
@@ -181,9 +168,8 @@ export class UserService extends PrismaGenericRepository<User> implements AbsUse
                     id: true,
                     firstName: true,
                     lastName: true,
-                    avatar: true,
                     email: true,
-                    birthDate: true,
+                    riotId: true,
                     role: true
                 }
             });

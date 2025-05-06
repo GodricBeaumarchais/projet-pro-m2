@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { User, UserSafe } from '../../core/entities';
 import { CreateUserDto, UpdateUserDto } from '../../core/dtos';
 import { UserFactoryService } from './user-factory.service';
@@ -24,7 +24,13 @@ export class UserUseCases {
         return this.dataServices.users.getUserSafe(id);
     }
 
-    createUser(createUserDto: CreateUserDto): Promise<User> {
+    async createUser(createUserDto: CreateUserDto): Promise<User> {
+        // Vérifier si l'email existe déjà
+        const existingUser = await this.findOneByEmail(createUserDto.email);
+        if (existingUser) {
+            throw new ConflictException('Un utilisateur avec cet email existe déjà');
+        }
+
         const user = this.userFactoryService.createNewUser(createUserDto);
         return this.dataServices.users.create(user);
     }
@@ -48,10 +54,6 @@ export class UserUseCases {
 
     getSelf(userId: string): Promise<Partial<User>> {
         return this.dataServices.users.getSelf(userId);
-    }
-
-    getOtherUsers(userId: string): Promise<Partial<User>[]> {
-        return this.dataServices.users.getOtherUsers(userId);
     }
 
     async searchUsersByEmail(searchTerm: string): Promise<UserSafe[]> {

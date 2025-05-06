@@ -7,27 +7,51 @@ services:
       target: development
     ports:
       - "3000:3000"
+      - "5555:5555"
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://user:password@postgres:5432/mydb
+      - ROLE_ADMIN_UUID=550e8400-e29b-41d4-a716-446655440000
+      - ROLE_SUPERADMIN_UUID=6ba7b810-9dad-11d1-80b4-00c04fd430c8
+      - ROLE_DEFAULT_UUID=7ba7b810-9dad-11d1-80b4-00c04fd430c9
+      - JWT_SECRET=votre_jwt_secret_tres_long_et_complexe
+      - JWT_EXPIRATION=3600
+      - RIOT_CLIENT_ID=705276
+      - RIOT_CLIENT_SECRET=RGAPI-23bcd959-0a29-4691-a75f-a6d3659d58a5
+      - RIOT_REDIRECT_URI=http://localhost:3000/auth/riot/callback
     volumes:
       - ./back:/app
       - /app/node_modules
+      - /app/dist
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "npx prisma migrate deploy && npm run start:dev"
-
+    command: >
+      sh -c "
+        npx prisma generate &&
+        npx prisma migrate dev --name init_schema --create-only &&
+        npx prisma db push &&
+        sleep 2 &&
+        npx prisma db seed &&
+        npx prisma studio & 
+        npm run start:dev
+      "
   api-prod:
     build: 
       context: ./back
       dockerfile: Dockerfile
       target: production 
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:pg3FJfDUlsYrJXqPyJZjszoxr2exRWIlyC8MXDjwQEX3QYmIe1Iiu5aERca0Zfl3@bccso0cog0s0w8cgws8woc8k:5432/postgres
+      - DATABASE_URL=postgresql://user:password@postgres:5432/mydb
+      - ROLE_ADMIN_UUID=550e8400-e29b-41d4-a716-446655440000
+      - ROLE_SUPERADMIN_UUID=6ba7b810-9dad-11d1-80b4-00c04fd430c8
+      - ROLE_DEFAULT_UUID=7ba7b810-9dad-11d1-80b4-00c04fd430c9
+    depends_on:
+      postgres:
+        condition: service_healthy
     command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
   postgres:
